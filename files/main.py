@@ -17,12 +17,18 @@ import graph
 
 
 st.set_page_config(layout="wide")
+hide_streamlit_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 c1, c2 = st.columns(2)
 
 with c1:
     st.title('Visualisation de votre portefeuille boursier')
-    st.subheader('Réalisé par Léandre Tuesta')
 with c2:
     st.markdown('   ', unsafe_allow_html=False)
     st.markdown('   ', unsafe_allow_html=False)
@@ -48,7 +54,7 @@ with st.sidebar:
     if st.button("Sign in"):
         add = login.sign_in(s_name, s_surname, s_email, s_password)
         if add == 0:
-            st.success("Nickel tu as été ajouté ")
+            st.success("Votre compte a bien été créé")
         elif add == -1:
             st.warning("Malheureusement votre email est déjà utilisé")
 
@@ -121,11 +127,11 @@ if selected == "Actions":
             if st.button('Vendre'):
                 add = da.add_operation(symbole, date, price, int(quantity), id, -1)
                 if add == 1:
-                    st.success("L'action a été vednu")
+                    st.success("L'action a été vendu ")
                 elif add == 0:
-                    st.warning("vous avez mois d'action que ce que vous essayez de vendre")
+                    st.warning("Vous avez moins d'action que ce que vous essayez de vendre")
                 elif add == -1: 
-                    st.warning("Action introuvable il y a certainement une erreur dans le symbole")
+                    st.warning("Action introuvable il y a certainement une erreur dans le symbole, merci de verifier")
 
         try:
             actions = da.get_quantity_actions(id)  ## faire en sorte de concaténer les valeurs 
@@ -166,4 +172,4 @@ if selected == "Actions":
 
         except ValueError as err:
             print("ValueError", err)
-            st.warning("Vous n'avez pas encore d'actions ! Allez les ajouter dans 'Actions' ")
+            st.warning("Vous n'avez pas encore d'actions! Allez les ajouter dans 'Actions' ")

@@ -59,6 +59,7 @@ def get_last_value(actions):
     df = []
     result = []
     for i in range(len(actions)):
+        print(actions)
         df.append(yf.download(actions['SYMBOLE'][i], start=date, end=None))
         df[i] = df[i].set_axis([ 'Open'+str(i), 'High'+str(i),'Low'+str(i),'Close'+str(i),'Adj Close'+str(i),'Volume'+str(i)], axis='columns')
     

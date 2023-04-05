@@ -21,17 +21,20 @@ def get_actions(id):
     return actions 
 
 def get_quantity_actions(id):
-    cursor.execute("""SELECT OPERATIONS.DATE, ACTIONS.SYMBOLE, ACTIONS.NAME, ROUND(avg(OPERATIONS.PRICE),2) as PRICE, sum(OPERATIONS.QUANTITY) as SUMQUANTITY 
-                    FROM OPERATIONS 
-                    INNER JOIN ACTIONS ON OPERATIONS.ID_ACTION = ACTIONS.ID_ACTION 
-                    WHERE OPERATIONS.ID_USER = %s
-                    GROUP BY ACTIONS.ID_ACTION 
-                    HAVING SUMQUANTITY > 0""" % (id)) 
+    cursor.execute("""SELECT AVERAGE.SYMBOLE, AVERAGE.PRICE, SUM(OPERATIONS.QUANTITY) as QUANTITY
+                        FROM (SELECT OP.ID_ACTION, ROUND(AVG(OP.PRICE),2) as PRICE, ACTIONS.SYMBOLE
+                            FROM OPERATIONS as OP
+                            INNER JOIN ACTIONS ON ACTIONS.ID_ACTION=OP.ID_ACTION
+                            WHERE OP.QUANTITY > 0 AND OP.ID_USER = %s
+                            GROUP BY OP.ID_ACTION) as AVERAGE
+                        INNER JOIN OPERATIONS ON AVERAGE.ID_ACTION=OPERATIONS.ID_ACTION
+                        WHERE OPERATIONS.ID_USER = %s
+                        GROUP BY OPERATIONS.ID_ACTION
+                        HAVING QUANTITY > 0 """ % (id,id)) 
     columns = list(map(lambda x: x[0], cursor.description))
 
     actions = pd.DataFrame(cursor.fetchall())
     actions = actions.set_axis(columns, axis='columns')
-    actions = actions.set_index([columns[0]])
 
     return actions 
 
